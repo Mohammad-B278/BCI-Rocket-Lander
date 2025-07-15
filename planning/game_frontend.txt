@@ -1,0 +1,121 @@
+UML Class Diagram:
+    classDiagram
+        class Game {
+            +pygame
+            +screen
+            +clock
+            +font
+            +rocket
+            +landing_pad
+            +game_state: str
+            +main_loop()*
+            +handle_input()*
+            +update_game_state()*
+            +draw_elements()*
+            +check_landing_success()*
+            +check_crash()*
+            +display_message(message)
+        }
+
+        class Rocket {
+            +x: int
+            +y: int
+            +vx: float
+            +vy: float
+            +width: int
+            +height: int
+            +thrust: float
+            +side_thrust: float
+            +gravity: float
+            +fuel: int
+            +image: Surface
+            +rect: Rect
+            +update(keys)*
+            +draw(surface)*
+            +apply_thrust()*
+            +apply_gravity()*
+        }
+
+        class LandingPad {
+            +x: int
+            +y: int
+            +width: int
+            +height: int
+            +rect: Rect
+            +draw(surface)*
+        }
+
+        Game "1" -- "1" Rocket : has a
+        Game "1" -- "1" LandingPad : has a
+
+
+Game Logic and Overview:
+    1. Game Components
+        Game Class: This is the main class that runs the game. It will manage the game loop, handle events, and coordinate all other game objects.
+
+        Rocket Class: Represents the player's rocket. It will have properties for position (x, y), velocity (vx, vy), and fuel. It will also contain the logic for movement and physics.
+
+        LandingPad Class: A simple class to define the area where the rocket needs to land.
+
+    2. Core Game Mechanics
+        Game Loop: The main_loop in the Game class is the heart of the game. It will continuously:
+
+        Handle Input: Check for keyboard presses.
+
+        Update Game State: Update the rocket's position and velocity based on physics and player input.
+
+        Render: Draw the rocket, landing pad, and other UI elements on the screen.
+
+        Check Win/Loss Conditions: Determine if the rocket has landed successfully or crashed.
+
+        Physics:
+
+        Gravity: A constant downward force will be applied to the rocket's vertical velocity (vy) in each frame to simulate gravity.
+
+        Thrust:
+
+        Main Thruster (Up Arrow): Applies an upward force, counteracting gravity. This will decrease the rocket's vy.
+
+        Side Thrusters (Left/Right Arrows): Apply horizontal forces to change the rocket's vx.
+
+        Fuel:
+
+        The rocket will have a limited amount of fuel.
+
+        Using the thrusters will consume fuel.
+
+        If the fuel runs out, the player will lose control of the thrusters, and the rocket will be subject only to gravity.
+
+    3. Win/Loss Conditions
+        Successful Landing: A landing is successful if the rocket:
+
+        Is within the boundaries of the landing pad.
+
+        Has a vertical velocity (vy) and horizontal velocity (vx) below a certain threshold upon contact.
+
+        Crash: The rocket crashes if:
+
+        It hits the ground outside the landing pad.
+
+        It lands on the pad with a velocity that is too high.
+
+        It goes off the screen boundaries.
+
+    Important Functions
+        Here are some of the key functions you'll need to implement:
+
+        Game.main_loop(): The main game loop that controls the flow of the game.
+
+        Game.handle_input(): Processes keyboard events to control the rocket.
+
+        Game.update_game_state(): Updates the positions and velocities of game objects.
+
+        Game.check_landing_success(): Checks if the win conditions have been met.
+
+        Game.check_crash(): Checks if the loss conditions have been met.
+
+        Rocket.update(keys): Updates the rocket's state based on the pressed keys and physics.
+
+        Rocket.apply_thrust(): Modifies the rocket's velocity when thrusters are engaged.
+
+        Rocket.apply_gravity(): Applies the force of gravity to the rocket.
