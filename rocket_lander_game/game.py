@@ -22,6 +22,10 @@ class Game:
 
         self.game_state = "running" # Possible states: running, crashed, landed
 
+        button_x = (SCREEN_WIDTH / 2) - (BUTTON_WIDTH / 2)
+        button_y = (SCREEN_HEIGHT / 2) + 50
+        self.restart_button_rect = pygame.Rect(button_x, button_y, BUTTON_WIDTH, BUTTON_HEIGHT)
+
     def main_loop(self):
         """Runs the main game loop, handling events, updates, and rendering."""
         while True: 
@@ -37,9 +41,14 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
-        keys = pygame.key.get_pressed()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.game_state != "running":
+                    mouse_pos = pygame.mouse.get_pos()
+                    
+                    if self.restart_button_rect.collidepoint(mouse_pos):
+                        self.reset_game()
 
-        # Only allow player input if the game is active
+        keys = pygame.key.get_pressed()
         if self.game_state == "running":
             self.rocket.update(keys)
 
@@ -60,8 +69,10 @@ class Game:
 
         if self.game_state == "crashed":
             self.display_message("CRASHED!", RED)
+            self.draw_restart_button()
         elif self.game_state == "landed":
             self.display_message("LANDING SUCCESSFUL!", GREEN)
+            self.draw_restart_button()
 
         pygame.display.flip()
 
@@ -99,3 +110,26 @@ class Game:
         message_surface = self.font.render(text, True, color)
         message_rect = message_surface.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
         self.screen.blit(message_surface, message_rect)
+
+    def reset_game(self):
+        """Resets the game to its initial state."""
+        print("Resetting game...")
+
+        # Reset the rocket's position, velocity, and fuel
+        self.rocket.x = SCREEN_WIDTH / 2
+        self.rocket.y = 50
+        self.rocket.vx = 0.0
+        self.rocket.vy = 0.0
+        self.rocket.fuel = 100
+        self.rocket.rect.center = (self.rocket.x, self.rocket.y)
+
+        self.game_state = "running"
+
+    def draw_restart_button(self):
+        """Draws the restart button on the screen."""
+
+        pygame.draw.rect(self.screen, GREEN, self.restart_button_rect)
+
+        restart_text_surface = self.font.render("Restart", True, BLACK)
+        restart_text_rect = restart_text_surface.get_rect(center=self.restart_button_rect.center)
+        self.screen.blit(restart_text_surface, restart_text_rect)
