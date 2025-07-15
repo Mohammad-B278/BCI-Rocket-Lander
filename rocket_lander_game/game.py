@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 from landing_pad import LandingPad
 from rocket import Rocket
 from settings import *
@@ -17,7 +18,7 @@ class Game:
 
         self.font = pygame.font.SysFont('Arial', 24)
 
-        self.landing_pad = LandingPad(x=350, y=550)
+        self.landing_pad = LandingPad(x = random.randint(250, 450), y = random.randint(450, 650))
         self.rocket = Rocket(x=SCREEN_WIDTH / 2, y=50)
 
         self.game_state = "running" # Possible states: running, crashed, landed
@@ -122,6 +123,8 @@ class Game:
         self.rocket.vy = 0.0
         self.rocket.fuel = 100
         self.rocket.rect.center = (self.rocket.x, self.rocket.y)
+        self.landing_pad = LandingPad(x = random.randint(50, 500), y = random.randint(350, 550))
+
 
         self.game_state = "running"
 
