@@ -104,7 +104,7 @@ if all_training_epochs:
 
     # We are interested in 3 classes: left, right, both_fists
     # Let's drop the 'both_feet' class for our 3-command lander game
-    final_training_epochs = final_training_epochs["left_fist", "right_fist", "both_fists"]
+    final_training_epochs = final_training_epochs["left_fist", "right_fist", "both_feet"]
 
     # Extract data and labels
     labels = final_training_epochs.events[:, -1]

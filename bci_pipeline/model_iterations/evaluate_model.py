@@ -5,7 +5,7 @@ from mne.datasets import eegbci
 
 # --- 1. Load the Saved Model and Test Subjects List ---
 print("Loading the trained model and the list of test subjects...")
-model = joblib.load('final_bci_model.pkl')
+model = joblib.load('bci_model.pkl')
 test_subjects = np.load('test_subjects.npy')
 
 # --- 2. Evaluate Model on Each Test Subject ---
