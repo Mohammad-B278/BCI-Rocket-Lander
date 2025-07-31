@@ -1,0 +1,79 @@
+Step 1: Data Acquisition & Exploration
+    Before I write any code, my first priority is to understand the data I'll be working with.
+
+        Download the Data: My starting point is the EEG Motor Movement/Imagery Dataset on PhysioNet.
+        It contains recordings from 109 volunteers performing various motor imagery tasks.
+
+        Understand the Tasks: The dataset involves four key tasks that are perfect for my rocket lander.
+        I will map them as follows:
+
+            Imagining opening and closing the left fist will map to "Thrust Left".
+
+            Imagining opening and closing the right fist will map to "Thrust Right".
+
+            Imagining opening and closing both fists will map to "Main Thruster".
+
+        Key Files & Formats: I've noted that the data is in EDF+ format. Crucially, the accompanying .event files contain the
+        timing markers for when each task starts:
+
+            T0: Rest period.
+
+            T1: Onset of the "left" or "both fists" imagery task.
+
+            T2: Onset of the "right" or "both feet" imagery task.
+
+Step 2: The Preprocessing Pipeline
+Raw EEG data is noisy, so I've planned a preprocessing pipeline using the mne-python library, which is the industry standard.
+
+    Load Data: I'll use mne.io.read_raw_edf() to load the EEG data and event markers into my Python environment.
+
+    Filtering: The most important brain signals for motor imagery are in the alpha (8−12 Hz) and beta (13−30 Hz) frequency bands.
+    I must apply a band-pass filter to the raw data to remove artifacts and noise.
+
+    Epoching: I'll slice the continuous data into small chunks called "epochs." An epoch is a short window of time,
+    starting just before a task marker (T1 or T2) and lasting a few seconds. This will give me individual data samples, 
+    each corresponding to a specific mental command.
+
+    Feature Extraction: I can't feed raw EEG epochs into a standard classifier. I will extract meaningful features
+    using Common Spatial Patterns (CSP). The CSP algorithm will design spatial filters to maximize the signal variance between two mental states (e.g., imagining left vs. right), providing a small set of powerful features for my classifier.
+
+    Step 3: Model Training
+    Once my data is preprocessed and features are extracted, I'll train a machine learning model.
+
+    Choose a Classifier: I don't need a massive deep learning model. I'll start with a simple and robust Linear Discriminant
+    Analysis (LDA) classifier, as it's highly effective for this type of BCI task. A Support Vector Machine (SVM) is a good
+    alternative I might explore later.
+
+    Train the Model:
+
+    I'll split my epoched data into a training set and a testing set.
+
+    I will train my LDA classifier on the training set. The "X" values will be the features from my CSP, and the "y" values will
+    be the labels ('left', 'right', 'both_fists').
+
+    Evaluate Performance: I will use the test set to see how accurately my model can predict commands. This will give me a good
+    metric for its potential real-time performance. I will then save my trained model (the CSP filters and the LDA classifier) to
+    a file using a library like joblib.
+
+Step 4: Integrating with Pygame (The Simulation)
+Now, I'll connect my trained model to the game. Since I don't have a live EEG stream, I'll simulate one using the test data
+I set aside earlier.
+
+Load the Model: In my Pygame script, I will load the saved CSP and LDA models.
+
+Create a "Fake Stream": I'll load the test data (the unseen epochs) to act as my simulated live input.
+
+Modify the Game Loop: In each iteration of my main Pygame loop, I will:
+
+Pull one epoch from my "fake stream" of test data.
+
+Pass this single epoch through the exact same preprocessing and feature extraction pipeline (filtering -> CSP).
+
+Feed the resulting features into my loaded LDA model to get a prediction (e.g., 'left').
+
+Use an if/elif/else block to trigger the corresponding rocket action in Pygame based on the model's prediction.
+
+Introduce a small delay (pygame.time.wait(100)) to simulate the pace of a real BCI system.
+
+This approach lets me build and debug the entire end-to-end software pipeline without needing the hardware. When I'm ready,
+I'll just replace the "fake stream" with a live data stream from my BCI device.
