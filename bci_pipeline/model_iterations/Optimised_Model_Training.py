@@ -61,10 +61,13 @@ if all_training_epochs:
     labels = final_training_epochs.events[:, -1]
     data = final_training_epochs.get_data(copy=False)
 
-    # ***CORRECTION: Define the pipeline with the BEST parameters from GridSearchCV***
-    csp = CSP(n_components=6, reg=None, log=True)
+    csp = CSP(n_components=10, reg=None, log=True) # Changed from 6 to 10
+
+    # Define the winning classifier with its optimal parameters
     svm = SVC(C=10, kernel='rbf', gamma='scale')
-    # SVC handles multiclass problems automatically
+
+    # Create the final, optimized pipeline.
+    # SVC handles multiclass problems automatically.
     final_pipeline = Pipeline([('CSP', csp), ('Classifier', svm)])
     
     # Fit the model ONCE on the entire training dataset
