@@ -1,2 +1,4 @@
-no. subjects, mean, standard deviation
-22, 0.3951, 0.2105
+version, no. subjects, mean, standard deviation
+baseline, 22, 0.3951, 0.2105
+optimised hyperparams - CSP + SVM, 22, 0.6644, 0.0142
+non-optimised hyperparams - Riemann + SVM, 22, 0.5762, 0.1249

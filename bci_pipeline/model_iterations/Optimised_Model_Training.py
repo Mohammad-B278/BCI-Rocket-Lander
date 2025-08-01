@@ -3,10 +3,10 @@ import mne
 import random
 import joblib
 from mne.datasets import eegbci
-from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from pyriemann.estimation import Covariances
 from pyriemann.tangentspace import TangentSpace
+from sklearn.pipeline import Pipeline
 
 # --- 1. Split Subjects into Training and Test Sets ---
 print("Splitting subjects into training and testing groups...")
@@ -63,7 +63,7 @@ if all_training_epochs:
     data = final_training_epochs.get_data(copy=False)
 
     # Define the final pipeline using the best parameters
-    svm = SVC(C=10, kernel='rbf', gamma='scale')
+    svm = SVC(C=1, kernel='linear')
     final_pipeline = Pipeline([
         ('Covariances', Covariances(estimator='lwf')),
         ('TangentSpace', TangentSpace(metric='riemann')),
