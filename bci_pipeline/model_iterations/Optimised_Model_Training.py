@@ -62,8 +62,9 @@ if all_training_epochs:
     labels = final_training_epochs.events[:, -1]
     data = final_training_epochs.get_data(copy=False)
 
-    # Define the final pipeline using the best parameters
-    svm = SVC(C=1, kernel='linear')
+    # Define the winning classifier with its optimal parameters
+    svm = SVC(C=100, kernel='rbf', gamma='scale')
+
     final_pipeline = Pipeline([
         ('Covariances', Covariances(estimator='lwf')),
         ('TangentSpace', TangentSpace(metric='riemann')),
