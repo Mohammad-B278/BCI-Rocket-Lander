@@ -3,10 +3,9 @@ import mne
 import random
 import joblib
 from mne.datasets import eegbci
-from sklearn.svm import SVC
-from pyriemann.estimation import Covariances
-from pyriemann.tangentspace import TangentSpace
 from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
+from mne.decoding import CSP
 
 # --- 1. Split Subjects into Training and Test Sets ---
 print("Splitting subjects into training and testing groups...")
@@ -62,21 +61,19 @@ if all_training_epochs:
     labels = final_training_epochs.events[:, -1]
     data = final_training_epochs.get_data(copy=False)
 
+    csp = CSP(n_components=10, reg=None, log=True) # Changed from 6 to 10
+
     # Define the winning classifier with its optimal parameters
-    svm = SVC(C=100, kernel='rbf', gamma='scale')
+    svm = SVC(C=10, kernel='rbf', gamma='scale')
 
-    final_pipeline = Pipeline([
-        ('Covariances', Covariances(estimator='lwf')),
-        ('TangentSpace', TangentSpace(metric='riemann')),
-        ('Classifier', svm)
-    ])
-
-    # *** THE MISSING STEP: Train the pipeline on your data ***
-    print("Fitting the final model...")
+    # Create the final, optimized pipeline.
+    # SVC handles multiclass problems automatically.
+    final_pipeline = Pipeline([('CSP', csp), ('Classifier', svm)])
+    
+    # Fit the model ONCE on the entire training dataset
     final_pipeline.fit(data, labels)
-    print("Fitting complete.")
 
-    # Now, save the FITTED model
+    # Save the trained model
     joblib.dump(final_pipeline, 'optimised_bci_model.pkl')
     print(f"\n✅ Optimised model has been trained and saved as 'optimised_bci_model.pkl'.")
 else:
