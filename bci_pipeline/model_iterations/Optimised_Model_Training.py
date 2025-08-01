@@ -5,7 +5,8 @@ import joblib
 from mne.datasets import eegbci
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
-from mne.decoding import CSP
+from pyriemann.estimation import Covariances
+from pyriemann.tangentspace import TangentSpace
 
 # --- 1. Split Subjects into Training and Test Sets ---
 print("Splitting subjects into training and testing groups...")
@@ -61,16 +62,20 @@ if all_training_epochs:
     labels = final_training_epochs.events[:, -1]
     data = final_training_epochs.get_data(copy=False)
 
-    # ***CORRECTION: Define the pipeline with the BEST parameters from GridSearchCV***
-    csp = CSP(n_components=6, reg=None, log=True)
+    # Define the final pipeline using the best parameters
     svm = SVC(C=10, kernel='rbf', gamma='scale')
-    # SVC handles multiclass problems automatically
-    final_pipeline = Pipeline([('CSP', csp), ('Classifier', svm)])
-    
-    # Fit the model ONCE on the entire training dataset
-    final_pipeline.fit(data, labels)
+    final_pipeline = Pipeline([
+        ('Covariances', Covariances(estimator='lwf')),
+        ('TangentSpace', TangentSpace(metric='riemann')),
+        ('Classifier', svm)
+    ])
 
-    # Save the trained model
+    # *** THE MISSING STEP: Train the pipeline on your data ***
+    print("Fitting the final model...")
+    final_pipeline.fit(data, labels)
+    print("Fitting complete.")
+
+    # Now, save the FITTED model
     joblib.dump(final_pipeline, 'optimised_bci_model.pkl')
     print(f"\n✅ Optimised model has been trained and saved as 'optimised_bci_model.pkl'.")
 else:
