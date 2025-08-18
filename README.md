@@ -26,7 +26,7 @@ Deep Learning (Planned): TensorFlow / Keras
 3. Project Structure
 The repository is organized to separate data exploration, model training, and application logic.
 
-"""
+'''
 .
 ├── bci_pipeline/
 │   ├── model_iterations/
@@ -63,7 +63,7 @@ The repository is organized to separate data exploration, model training, and ap
 ├── .DS_Store
 ├── LICENSE
 └── README.md
-"""
+'''
 
 4. Project Journey & Methodology
 The project follows a systematic pipeline, from raw data ingestion to model evaluation. The methodology has evolved based on experimental results.
