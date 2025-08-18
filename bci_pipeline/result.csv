@@ -5,3 +5,4 @@ non-optimised hyperparams - Riemann + SVM, 22, 0.5762, 0.1249
 optimised hyperparameters - Rieman + SVM, 22, 0.5646, 0.1257
 optimised hyperparameters V2 - Rieman + SVM, 22, 0.5825, 0.1273
 optimised hyperparames - 20 subjects - CSP + SVM, 22, 0.6630, 0.0156
+corrected from 2 to 3 classification problem - CSP + SVM, 22, 0.4501, 0.1121

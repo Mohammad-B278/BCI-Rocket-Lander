@@ -26,27 +26,37 @@ print(f"Final test set: {len(test_subjects)} subjects (saved to 'test_subjects.n
 all_training_epochs = []
 print(f"\nLoading and processing data for all {len(train_subjects)} training subjects...")
 
-for subject_id in train_subjects: # ***CORRECTION: Loop through the full training set***
+for subject_id in train_subjects:
     try:
+        # Runs for left vs. right fist
         runs_lr = [4, 8, 12]
-        runs_f = [6, 10, 14]
+        # Runs for hands vs. feet (we only need the feet trials from here)
+        runs_f = [6, 10, 14] 
+        
         fnames_lr = eegbci.load_data(subject_id, runs=runs_lr, verbose=False)
         fnames_f = eegbci.load_data(subject_id, runs=runs_f, verbose=False)
 
         raw_lr = mne.concatenate_raws([mne.io.read_raw_edf(f, preload=True, verbose=False) for f in fnames_lr])
         raw_f = mne.concatenate_raws([mne.io.read_raw_edf(f, preload=True, verbose=False) for f in fnames_f])
 
+        # This helper function processes the raw data
         def process_and_epoch(raw, event_id_map, event_id_labels):
             raw.filter(l_freq=8., h_freq=35., verbose=False)
             events, _ = mne.events_from_annotations(raw, event_id=event_id_map, verbose=False)
-            epochs = mne.Epochs(raw, events, event_id_labels, tmin=-0.5, tmax=3.5, preload=True,
+            # Important: We pass the descriptive labels here
+            epochs = mne.Epochs(raw, events, event_id_labels, tmin= 0.5, tmax=2.5, preload=True,
                                 baseline=None, picks='eeg', verbose=False)
             epochs.resample(160., verbose=False)
             return epochs
 
+        # Process left/right fist (labels 1 and 2)
         epochs_lr = process_and_epoch(raw_lr, {'T1': 1, 'T2': 2}, {'left_fist': 1, 'right_fist': 2})
-        epochs_f = process_and_epoch(raw_f, {'T2': 2}, {'both_feet': 2})
+        
+        # Process both feet (label 3)
+        # In runs 6, 10, 14, the annotation 'T2' corresponds to feet movement.
+        epochs_f = process_and_epoch(raw_f, {'T2': 3}, {'both_feet': 3})
 
+        # Combine the epochs for this subject
         all_training_epochs.append(mne.concatenate_epochs([epochs_lr, epochs_f], verbose=False))
         print(f"  Successfully processed subject {subject_id}.")
 
@@ -58,23 +68,23 @@ if all_training_epochs:
     print("\nTraining the final, optimized model on all collected data...")
     final_training_epochs = mne.concatenate_epochs(all_training_epochs, verbose=False)
 
+    # The labels will now be 1, 2, and 3
     labels = final_training_epochs.events[:, -1]
     data = final_training_epochs.get_data(copy=False)
 
-    csp = CSP(n_components=10, reg=None, log=True) # Changed from 6 to 10
+    # CSP handles multiclass by using a one-vs-rest strategy, which is fine.
+    csp = CSP(n_components=10, reg=None, log=True)
 
-    # Define the winning classifier with its optimal parameters
+    # SVC handles multiclass problems automatically.
     svm = SVC(C=10, kernel='rbf', gamma='scale')
 
-    # Create the final, optimized pipeline.
-    # SVC handles multiclass problems automatically.
     final_pipeline = Pipeline([('CSP', csp), ('Classifier', svm)])
     
-    # Fit the model ONCE on the entire training dataset
+    # Fit the model on the entire training dataset with 3 classes
     final_pipeline.fit(data, labels)
 
     # Save the trained model
     joblib.dump(final_pipeline, 'optimised_bci_model.pkl')
-    print(f"\n✅ Optimised model has been trained and saved as 'optimised_bci_model.pkl'.")
+    print(f"\n✅ Optimised 3-class model has been trained and saved as 'optimised_bci_model.pkl'.")
 else:
     print("\n❌ No data was processed, model could not be trained.")
