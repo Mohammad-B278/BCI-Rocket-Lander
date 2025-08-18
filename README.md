@@ -26,16 +26,44 @@ Deep Learning (Planned): TensorFlow / Keras
 3. Project Structure
 The repository is organized to separate data exploration, model training, and application logic.
 
+"""
 .
-├── model_trainingV1_CSP_SVM/
-│   └── train_csp_svm.py
-├── model_trainingV2_NeuralNet/
-│   └── (in progress)
-├── evaluation/
-│   └── evaluate_models.py
-├── data/
-│   └── (data handling scripts)
+├── bci_pipeline/
+│   ├── model_iterations/
+│   │   ├── Optimised_Model_Training.py
+│   │   ├── Subject_Specific_Model.py
+│   │   ├── bci_model.pkl
+│   │   ├── evaluate_model.py
+│   │   ├── model_training.py
+│   │   ├── optimised_bci_model.pkl
+│   │   ├── test_subjects.npy
+│   │   └── testing.py
+│   ├── notebooks/
+│   │   ├── .ipynb_checkpoints/
+│   │   ├── 01_Data_Exploration.ipynb
+│   │   ├── 02_Hyperparameter_Tuning-C....ipynb
+│   │   └── 03_Riemannian_Tuning.ipynb
+│   ├── .DS_Store
+│   ├── PROJECT_LOG.MD
+│   ├── result.csv
+│   └── test_subjects.npy
+├── planning/
+│   ├── BCI_pipeline.txt
+│   └── game_frontend.txt
+├── rocket_lander_game/
+│   ├── __pycache__/
+│   ├── assets/
+│   │   └── images/
+│   ├── .DS_Store
+│   ├── game.py
+│   ├── landing_pad.py
+│   ├── main.py
+│   ├── rocket.py
+│   └── settings.py
+├── .DS_Store
+├── LICENSE
 └── README.md
+"""
 
 4. Project Journey & Methodology
 The project follows a systematic pipeline, from raw data ingestion to model evaluation. The methodology has evolved based on experimental results.
